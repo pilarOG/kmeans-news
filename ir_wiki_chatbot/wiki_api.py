@@ -4,9 +4,9 @@
 import wikipediaapi
 
 wiki_wiki = wikipediaapi.Wikipedia(
-        language='en',
+        language='es',
         extract_format=wikipediaapi.ExtractFormat.WIKI
 )
 
-p_wiki = wiki_wiki.page("cat")
+p_wiki = wiki_wiki.page("Elena Caffarena")
 print(p_wiki.text)
