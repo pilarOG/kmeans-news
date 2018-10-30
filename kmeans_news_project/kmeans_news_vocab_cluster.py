@@ -210,14 +210,33 @@ def main(embedding_vector_size=300,
                     r.append([i,j,result])
 
     print(sorted(r, key=lambda x: x[2])[-100:])
-
-
-    from scipy import spatial
-    a = spatial.distance.cosine(word_vectors['pasionales'], word_vectors['mujer'])
-    b = spatial.distance.cosine(word_vectors['pasionales'], word_vectors['hombre'])
-    print(a-b)
     '''
 
+    # A natural metric for the embedding bias is the average distance for women minus the average distance for men. (Garg et al)
+    from scipy import spatial
+    a = spatial.distance.cosine(word_vectors['detenido'], word_vectors['hombre'])
+    b = spatial.distance.cosine(word_vectors['detenido'], word_vectors['mujer'])
+    #print(a-b)
+    a = spatial.distance.cosine(word_vectors['pareja'], word_vectors['hombre'])
+    b = spatial.distance.cosine(word_vectors['pareja'], word_vectors['victima'])
+    #print(a-b)
+
+    # tratando de ilustrar
+    labels = ['pareja','victima','familia','mujer','hombre','detenido','asesino', 'acusado',
+              'femicidio','violencia','asesinato','muerte','homicidio']
+    vcts = []
+    for l in labels:
+        vcts.append(list(word_vectors[l]))
+    vcts = np.asarray(vcts).astype('float64')
+    #print(vcts)
+    Z = PCA().fit_transform(vcts)
+    # plot the result
+    plt.scatter(Z[:, 0], Z[:, 1])
+    for l in range(0, len(labels)):
+        plt.annotate(labels[l], (Z[l,:][0],Z[l,:][1]))
+    plt.show()
+
+    '''
     # Given the trained embeddings we can already get some interesting results. Here we are searching
     # in the model some specific relevant word given the topic and the function allows us to get back the
     # other words that are closest to the given word. In the Readme there is a deeper analysis of this.
@@ -271,8 +290,8 @@ def main(embedding_vector_size=300,
     if show_cluster_plot==True:
         plot_reduced_data(means, hard, kmeans_k, Z, word_index, plot_name=plot_name)
     return costs
+    '''
 
-    
 
 # Run predfined parameters
 main()
