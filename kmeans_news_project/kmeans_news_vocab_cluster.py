@@ -166,8 +166,8 @@ def soft_k_means(X, K, index_word_map, prob_vector, max_iter=20, beta=1.0):
 
 ########## MAIN #################
 # Best combination of hyperparameters found: 300-6-3-40-30
-def main(embedding_vector_size=50,
-         embedding_window_size=2,
+def main(embedding_vector_size=300,
+         embedding_window_size=6,
          embedding_min_count=3,
          tsne_perplexity=40,
          kmeans_k=30,
@@ -210,9 +210,13 @@ def main(embedding_vector_size=50,
                     r.append([i,j,result])
 
     print(sorted(r, key=lambda x: x[2])[-100:])
-    '''
 
-    print(word_vectors.similar_by_word("asesino"))
+
+    from scipy import spatial
+    a = spatial.distance.cosine(word_vectors['pasionales'], word_vectors['mujer'])
+    b = spatial.distance.cosine(word_vectors['pasionales'], word_vectors['hombre'])
+    print(a-b)
+    '''
 
     # Given the trained embeddings we can already get some interesting results. Here we are searching
     # in the model some specific relevant word given the topic and the function allows us to get back the
@@ -238,7 +242,7 @@ def main(embedding_vector_size=50,
     similarity_array = np.array(similarity_matrix)
     word_index = model.wv.index2word
 
-    '''
+
 
     # In parallel I will use the frequencies to build a vector of the probability of each word using the data
     # We use this vector to initialize the means (M) in the algorithm, hoping it is informative
@@ -268,7 +272,7 @@ def main(embedding_vector_size=50,
         plot_reduced_data(means, hard, kmeans_k, Z, word_index, plot_name=plot_name)
     return costs
 
-    '''
+    
 
 # Run predfined parameters
 main()
