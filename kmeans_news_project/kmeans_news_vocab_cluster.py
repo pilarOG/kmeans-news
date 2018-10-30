@@ -40,12 +40,12 @@ import codecs
 import gensim
 
 # Some spanish stopwords (with some misspellings too) and some specific for this data
-stopwords = [u'del', u'la', u'de', u'y', u'en', u'un', u'el', u'la', u'un', u'una', u'los', u't', u'd',
-         u'ls', u'las', u'unos', u'unas', u'uns', u'del', u'dl', u'al', u'la', u'el', u'le', u'p', u'hay',
-         u'esta', u'lo', u'fue', u'es', u'quien', u'su', u'sus', u'mas', u'durante', u'hasta', u'estos',
-         u'las', u'los', u'y', u'con', u'de', u'para', u'por', u'al', u'a', u'ha', u'luego', u'estar',
-         u'respectivamente', u'asimismo', u'l', u'les', u'montt', u'nos', u'va', u'emol', u'ademas',
-         u'son', u'ese', u'era', u'eran', u'ser', u'm', u'e', u'g', u'esos', u'eso', u'asi', u'esa', u'esto',
+stopwords = [u'del', u'la', u'de', u'y', u'en', u'un', u'el', u'la', u'un', u'una', u'los', u't', u'd', u'nelly', u'tiene', u'ello',
+         u'ls', u'las', u'unos', u'unas', u'uns', u'del', u'dl', u'al', u'la', u'el', u'le', u'p', u'hay', u'tambien', u'valderrama',
+         u'esta', u'lo', u'fue', u'es', u'quien', u'su', u'sus', u'mas', u'durante', u'hasta', u'estos', 'pudahuel', u'paola',
+         u'las', u'los', u'y', u'con', u'de', u'para', u'por', u'al', u'a', u'ha', u'luego', u'estar', 'murakami', u'bernardita',
+         u'respectivamente', u'asimismo', u'l', u'les', u'montt', u'nos', u'va', u'emol', u'ademas', u'pero', u'sido',
+         u'son', u'ese', u'era', u'eran', u'ser', u'm', u'e', u'g', u'esos', u'eso', u'asi', u'esa', u'esto', u'tienen',
          u'desde', u'una', u'un', u'o', u'en', u'me', u'y', u'se', u'que', u'como', u'porque', u'este', u'']
 
 # Function to very naive tokenization of words for Spanish
@@ -94,7 +94,8 @@ def plot_reduced_data(means, assigned_clusters, kmeans_k, Z, word_index, plot_na
             if assigned_clusters[i] == k:
                 x.append(Z[i,0])
                 y.append(Z[i,1])
-        scat = plt.scatter(x,y,c=np.random.random((kmeans_k,)),marker=np.random.choice(['o', '*', 'h','d', 'v', '^', '<', '>']))
+        #scat = plt.scatter(x,y,c=np.random.random((kmeans_k,)),marker=np.random.choice(['o', '*', 'h','d', 'v', '^', '<', '>']))
+        scat = plt.scatter(x,y,marker=np.random.choice(['o', '*', 'h','d', 'v', '^', '<', '>']))
         scatters.append(scat)
     plt.legend(scatters,cluster_names, scatterpoints=1, loc='lower left', ncol=8,fontsize=6)
     plt.savefig(plot_name)
@@ -165,11 +166,11 @@ def soft_k_means(X, K, index_word_map, prob_vector, max_iter=20, beta=1.0):
 
 ########## MAIN #################
 # Best combination of hyperparameters found: 300-6-3-40-30
-def main(embedding_vector_size=300,
-         embedding_window_size=6,
+def main(embedding_vector_size=50,
+         embedding_window_size=2,
          embedding_min_count=3,
          tsne_perplexity=40,
-         kmeans_k=50,
+         kmeans_k=30,
          plot_name='test.png',
          show_cluster_plot=True,
          reducer='tsne'):
@@ -192,6 +193,26 @@ def main(embedding_vector_size=300,
     model.build_vocab(all_tokens)
     model.train(all_tokens, total_examples=model.corpus_count, epochs=model.iter)
     word_vectors = model.wv
+
+    # analogias
+    '''
+    r = []
+    from scipy import spatial
+    x = 'mujer'
+    y = 'pareja'
+    a = word_vectors[x] - word_vectors[y]
+    for i in word_vectors.vocab:
+        for j in word_vectors.vocab:
+            if i != x and i != y and j != x and j != y and i != j:
+                b = word_vectors[i] - word_vectors[j]
+                if np.linalg.norm(b) < 1:
+                    result = spatial.distance.cosine(a, b) # mientras mas parecido mejor
+                    r.append([i,j,result])
+
+    print(sorted(r, key=lambda x: x[2])[-100:])
+    '''
+
+    print(word_vectors.similar_by_word("asesino"))
 
     # Given the trained embeddings we can already get some interesting results. Here we are searching
     # in the model some specific relevant word given the topic and the function allows us to get back the
@@ -216,6 +237,8 @@ def main(embedding_vector_size=300,
     [similarity_matrix.append(sims) for sims in index]
     similarity_array = np.array(similarity_matrix)
     word_index = model.wv.index2word
+
+    '''
 
     # In parallel I will use the frequencies to build a vector of the probability of each word using the data
     # We use this vector to initialize the means (M) in the algorithm, hoping it is informative
@@ -244,6 +267,8 @@ def main(embedding_vector_size=300,
     if show_cluster_plot==True:
         plot_reduced_data(means, hard, kmeans_k, Z, word_index, plot_name=plot_name)
     return costs
+
+    '''
 
 # Run predfined parameters
 main()
