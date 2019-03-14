@@ -223,7 +223,7 @@ def main(embedding_vector_size=300,
 
     # tratando de ilustrar
     labels = ['pareja','victima','familia','mujer','hombre','detenido','asesino', 'acusado',
-              'femicidio','violencia','asesinato','muerte','homicidio']
+              'femicidio','violencia','asesinato','muerte','homicidio','celos', 'ministra']
     vcts = []
     for l in labels:
         vcts.append(list(word_vectors[l]))
