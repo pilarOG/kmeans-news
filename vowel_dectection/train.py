@@ -2,20 +2,17 @@
 # After classification find the peak intensity on consecutive frames classified as vowels
 # Add marks at the chosen points and calculate speech rate using them
 
-
-# 1) Where do we get data from? would it need to be of the same language?
-# I only have pre-aligned data for spanish, so I will train with that and I will test in English
-# 2) What model?
-# I would like to start trying with LSTMs
-# 3) What features?
-# Let's start with mfccs
-
+from __future__ import print_function, division
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from get_labels import upsample_alignment
 from load_data import load_waves, load_labels
 from configure import load_config
 from argparse import ArgumentParser
 from extract_features import extract_mfccs
 import numpy as np
-
+import os
 
 ### MAIN ###
 
@@ -23,7 +20,17 @@ a = ArgumentParser()
 a.add_argument('-c', dest='config', required=True, type=str)
 opts = a.parse_args()
 settings = load_config(opts.config)
-waveforms = load_waves(settings)
-mfccs = extract_mfccs(waveforms, settings)
+
+# Load training data
+file_list = os.listdir(settings.wav_folder)
+#TODO: check that there are only wave files
+waveforms = load_waves(settings, file_list)
+mfccs, max_T = extract_mfccs(waveforms, settings)
 # print mfccs.shape # (number of files, max_T, 12 coeff)
-alignments = load_labels(settings)
+alignments = load_labels(settings, file_list)
+targets = upsample_alignment(alignments, max_T, settings)
+print ('mfccs shape', np.array(mfccs).shape)
+print ('targets shape', np.array(targets).shape)
+
+x_train = np.array(mfccs)
+y_train = np.array(targets)
